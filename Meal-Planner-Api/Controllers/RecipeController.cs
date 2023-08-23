@@ -45,13 +45,21 @@ namespace Meal_Planner_Api.Controllers
         }
 
         [HttpPost]
-        public ActionResult<RecipeDTO> CreateRecipe([FromBody] Recipe recipe)
+        public IActionResult CreateRecipe([FromBody] Recipe recipe)
         {
+            // Add the instructions to the recipe
+            recipe.Instructions = recipe.Instructions.Select(instructionText =>
+                new Instruction { Text =  instructionText.Text}).ToList();
+
+
+            // Add the recipe and its associated instructions to the database
             _recipeRepository.AddRecipe(recipe);
 
-
-            return CreatedAtAction(nameof(GetRecipe), new { id = recipe.Id }, recipe);
+            // Return the newly created recipe
+            var createdRecipe = _mapper.Map<Recipe>(recipe);
+            return CreatedAtAction(nameof(GetRecipe), new { id = createdRecipe.Id }, createdRecipe);
         }
+
 
         [HttpPut("{id}")]
         public ActionResult UpdateRecipe(int id, RecipeDTO recipeUpdateDto)

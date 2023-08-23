@@ -9,7 +9,7 @@
         public int PreparationTime { get; set; }
         public int CookingTime { get; set; }
         public int Servings { get; set; }
-        public int Rating { get; set; }
+        public double Rating { get; set; }
         public ICollection<Ingredient> Ingredients { get; set; }
         public ICollection<Instruction> Instructions { get; set; }
         public bool Deleted { get; set; }
