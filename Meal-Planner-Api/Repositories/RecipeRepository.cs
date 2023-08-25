@@ -39,11 +39,43 @@ namespace Meal_Planner_Api.Repositories
             return recipe;
         }
 
+        // upsert
         public void UpdateRecipe(Recipe recipe)
         {
-            _context.Entry(recipe).State = EntityState.Modified;
+
+            // existingRecipe is a reference to _context and therefore changes to existingRecipe will reflect _context.
+            var existingRecipe = _context.Recipes
+                                    .Include(r => r.Ingredients)
+                                    .Include(r => r.Instructions)
+                                    .FirstOrDefault(r => r.Id == recipe.Id);
+
+            if (existingRecipe == null)
+            {
+                throw new ArgumentException("Recipe not found");
+            }
+
+            if(!Enumerable.SequenceEqual(existingRecipe.Ingredients, recipe.Ingredients))
+            {
+                existingRecipe.Ingredients.Clear();
+
+                foreach (var ingredient in recipe.Ingredients)
+                    existingRecipe.Ingredients.Add(ingredient);
+
+            }
+
+            if(!Enumerable.SequenceEqual(existingRecipe.Instructions, recipe.Instructions))
+            {
+                existingRecipe.Instructions.Clear();
+
+                foreach(var instruction in recipe.Instructions)
+                    existingRecipe.Instructions.Add(instruction);
+            }
+
+
             _context.SaveChanges();
         }
+
+
 
         public void DeleteRecipe(int id)
         {
