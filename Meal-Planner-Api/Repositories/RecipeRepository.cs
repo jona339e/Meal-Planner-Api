@@ -44,6 +44,7 @@ namespace Meal_Planner_Api.Repositories
         {
 
             // existingRecipe is a reference to _context and therefore changes to existingRecipe will reflect _context.
+            // then we include ingredients and instructions or we won't be able to access them later
             var existingRecipe = _context.Recipes
                                     .Include(r => r.Ingredients)
                                     .Include(r => r.Instructions)
@@ -54,6 +55,8 @@ namespace Meal_Planner_Api.Repositories
                 throw new ArgumentException("Recipe not found");
             }
 
+            // compares _context ingredients and input ingredients, if they are not the same eg. changes was made. we clear the _context and add the input to the context, ensuring all changes are reflected
+            // next we do the same for instructions
             if(!Enumerable.SequenceEqual(existingRecipe.Ingredients, recipe.Ingredients))
             {
                 existingRecipe.Ingredients.Clear();

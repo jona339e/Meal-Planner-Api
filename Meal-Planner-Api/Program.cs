@@ -2,6 +2,7 @@ using Meal_Planner_Api.Data;
 using Meal_Planner_Api.Interfaces;
 using Meal_Planner_Api.Repositories;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -16,10 +17,14 @@ builder.Services.AddDbContext<DataContext>(options =>
 
 builder.Services.AddCors(options =>
 {
-    options.AddDefaultPolicy(
-        policy =>
+    var allowedOrigins = builder.Configuration.GetSection("AllowedOrigins").Get<string[]>();
+
+    options.AddDefaultPolicy(policy =>
         {
-            policy.AllowAnyHeader().AllowAnyOrigin().AllowAnyMethod();
+
+            policy.WithOrigins(allowedOrigins)
+                  .WithHeaders("content-type")
+                  .WithMethods("GET", "POST", "PUT", "DELETE");
         });
 });
 
